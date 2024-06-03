@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload to Firebase</title>
+</head>
+<body>
+<h1>Upload Song to Firebase Storage</h1>
+<form method="POST"      th:action="@{/uploadPage}" enctype="multipart/form-data">
+    <label for="songName">Song Name:</label><br>
+    <input type="text" id="songName" name="songName" required><br>
+
+    <label for="songFile">Song File:</label><br>
+    <input type="file" id="songFile" name="songFile" required><br>
+
+    <label for="songImage">Song Image :</label><br>
+    <input type="file" id="songImage" name="songImage" required><br>
+
+    <button type="submit">Upload</button>
+</form>
+</body>
+</html>
