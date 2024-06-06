@@ -142,7 +142,7 @@ public class WebController {
 
         // Generate and return the signed URL for the file
         return StorageClient.getInstance().bucket(bucketName).get(fileName)
-                .signUrl(15, java.util.concurrent.TimeUnit.MINUTES).toString(); // URL expires in 15 minutes
+                .signUrl(9999, java.util.concurrent.TimeUnit.MINUTES).toString(); // URL expires in 15 minutes
     }
 
     private void uploadSongToFirestore(Song song) {
@@ -162,4 +162,79 @@ public class WebController {
         docRef.set(songData);
     }
 
+    @GetMapping("/login")
+    @ResponseBody
+    public String showLoginPage(Model model) throws Exception {
+        String htmlContent = loadHtmlFromResource("static/login.html");
+
+        model.addAttribute("user", new User());
+        return htmlContent; // Assuming "uploadPage" is the name of your HTML view
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestParam String username, @RequestParam String password, Model model) {
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<QuerySnapshot> querySnapshot = firestore.collection("users").whereEqualTo("username", username).get();
+
+        try {
+            List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+            if (!documents.isEmpty()) {
+                QueryDocumentSnapshot document = documents.get(0);
+                String storedPassword = document.getString("password");
+                System.out.println("hi");
+                if (storedPassword.equals(password)) {
+                    model.addAttribute("message", "Login successful!");
+                    return "welcome"; // Redirect to a welcome page or dashboard
+                } else {
+                    model.addAttribute("message", "Incorrect password. Please try again.");
+                    return "login";
+                }
+            } else {
+                model.addAttribute("message", "User not found. Please try again.");
+                return "login";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("message", "An error occurred. Please try again.");
+            return "index";
+        }
+    }
+
+
+    @GetMapping("/signup")
+    @ResponseBody
+    public String showSignupPage(Model model) throws Exception {
+        String htmlContent = loadHtmlFromResource("static/signup.html");
+
+        model.addAttribute("user", new User());
+        return htmlContent; // Assuming "uploadPage" is the name of your HTML view
+    }
+
+    @PostMapping("/signup")
+    public String signup(@RequestParam String username, @RequestParam String password, Model model) {
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<QuerySnapshot> querySnapshot = firestore.collection("users").whereEqualTo("username", username).get();
+
+        try {
+            List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+            if (!documents.isEmpty()) {
+                model.addAttribute("message", "Username already exists. Please choose another.");
+                return "signup";
+            } else {
+                Map<String, Object> newUser = new HashMap<>();
+                newUser.put("username", username);
+                newUser.put("password", password);
+
+                ApiFuture<WriteResult> writeResult = firestore.collection("users").document().set(newUser);
+                writeResult.get(); // Ensure the write operation completes
+
+                model.addAttribute("message", "Signup successful! Please log in.");
+                return "login";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("message", "An error occurred. Please try again.");
+            return "signup";
+        }
+    }
 }
