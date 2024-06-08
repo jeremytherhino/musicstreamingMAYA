@@ -36,24 +36,8 @@ public class WebController {
 
     private String bucketName = "musicstream2-2d8e9.appspot.com";
 
-//    @GetMapping("/")
-//    @ResponseBody
-//    public String home() throws Exception {
-//        String fileName = "song.mp3";
-//
-//        String signedUrl = StorageClient.getInstance().bucket(bucketName).get(fileName)
-//                .signUrl(15, TimeUnit.MINUTES)
-//                .toString();
-//
-//        String htmlContent = loadHtmlFromResource("static/index.html");
-//
-//        // Replace the placeholder with the signed URL in the HTML content
-//        htmlContent = htmlContent.replace("{{signedUrl}}", signedUrl);
-//
-//        return htmlContent;
-//    }
 
-    @GetMapping("/")
+    @GetMapping("/main")
     @ResponseBody
     public String home() throws ExecutionException, InterruptedException, IOException {
         List<Song> songs = getSongsFromFirestore(); // Get list of songs from Firestore
@@ -162,13 +146,13 @@ public class WebController {
         docRef.set(songData);
     }
 
-    @GetMapping("/login")
+    @GetMapping("/")
     @ResponseBody
     public String showLoginPage(Model model) throws Exception {
         String htmlContent = loadHtmlFromResource("static/login.html");
 
         model.addAttribute("user", new User());
-        return htmlContent; // Assuming "uploadPage" is the name of your HTML view
+        return htmlContent;
     }
 
     @PostMapping("/login")
@@ -184,7 +168,7 @@ public class WebController {
                 System.out.println("hi");
                 if (storedPassword.equals(password)) {
                     model.addAttribute("message", "Login successful!");
-                    return "welcome"; // Redirect to a welcome page or dashboard
+                    return "redirect:/main"; // Redirect to a main page
                 } else {
                     model.addAttribute("message", "Incorrect password. Please try again.");
                     return "login";
@@ -219,7 +203,7 @@ public class WebController {
             List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
             if (!documents.isEmpty()) {
                 model.addAttribute("message", "Username already exists. Please choose another.");
-                return "signup";
+                return "redirect:/signup";
             } else {
                 Map<String, Object> newUser = new HashMap<>();
                 newUser.put("username", username);
@@ -229,12 +213,12 @@ public class WebController {
                 writeResult.get(); // Ensure the write operation completes
 
                 model.addAttribute("message", "Signup successful! Please log in.");
-                return "login";
+                return "redirect:/main";
             }
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("message", "An error occurred. Please try again.");
-            return "signup";
+            return "redirect:/signup";
         }
     }
 }

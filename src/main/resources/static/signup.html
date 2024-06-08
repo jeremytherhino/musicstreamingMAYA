@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Signup</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,24 +13,25 @@
             align-items: center;
             height: 100vh;
         }
-        .login-container {
+        .signup-container {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .login-container h2 {
+        .signup-container h2 {
             margin-bottom: 20px;
         }
-        .login-container input[type="text"],
-        .login-container input[type="password"] {
+        .signup-container input[type="text"],
+        .signup-container input[type="password"],
+        .signup-container input[type="email"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .login-container button {
+        .signup-container button {
             width: 100%;
             padding: 10px;
             background-color: #28a745;
@@ -39,18 +40,50 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        .login-container button:hover {
+        .signup-container button:hover {
             background-color: #218838;
         }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
     </style>
+    <script>
+        function validateForm() {
+            var password = document.forms["signupForm"]["password"].value;
+            var confirmPassword = document.forms["signupForm"]["confirmPassword"].value;
+            var email = document.forms["signupForm"]["email"].value;
+            var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            var passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+            var errorMessage = "";
+
+            if (!emailPattern.test(email)) {
+                errorMessage += "Invalid email format.\\n";
+            }
+            if (!passwordPattern.test(password)) {
+                errorMessage += "Password must be at least 6 characters long, including upper, lower case letters and digits.\\n";
+            }
+            if (password !== confirmPassword) {
+                errorMessage += "Passwords do not match.\\n";
+            }
+            if (errorMessage) {
+                alert(errorMessage);
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
-<div class="login-container">
-    <h2>Login</h2>
-    <form action="/signup" method="post">
+<div class="signup-container">
+    <h2>Signup</h2>
+    <form name="signupForm" action="/signup" method="post" onsubmit="return validateForm()">
         <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="confirmPassword" placeholder="Re-enter Password" required>
         <button type="submit">Signup</button>
+        <a href="/login">Already registered? Login here...</a>-->
     </form>
 </div>
 </body>
